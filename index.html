@@ -69,7 +69,7 @@
           <i class="fa-solid fa-user-shield"></i>
         </div>
         <div class="user-info">
-          <div class="user-name">Sustainability Pilot</div>
+          <div class="user-name" id="profile-user-name">Sustainability Pilot</div>
           <div class="user-level-tag">Level <span id="profile-level">3</span> Champion</div>
           <div class="xp-bar-container-mini">
             <div class="xp-bar-fill-mini" id="profile-xp-bar-fill" style="width: 50%;"></div>
@@ -86,7 +86,7 @@
       <header class="top-header">
         <div class="header-search">
           <h1>Sustainability Control Center</h1>
-          <p class="header-subtitle">Enterprise ESG Analytics & Predictive Simulation Engine</p>
+          <p class="header-subtitle"><i class="fa-solid fa-user-circle text-cyan"></i> Pilot: <span id="header-user-name" class="font-bold text-glow-cyan">Admin</span> (<span id="header-user-dept">HQ</span>) | ESG Control Center</p>
         </div>
         <div class="header-actions">
           <div class="system-status">
@@ -582,7 +582,9 @@
 
   <!-- LOGIN GATEWAY -->
   <div id="login-container" class="login-overlay hidden-gate">
-    <div class="login-card glass-card border-glow-green animate-fade-in">
+    
+    <!-- LOGIN CARD -->
+    <div class="login-card glass-card border-glow-green animate-fade-in" id="login-card">
       <div class="login-brand">
         <div class="logo-icon">
           <i class="fa-solid fa-leaf text-glow-green"></i>
@@ -619,8 +621,73 @@
         <button type="submit" class="btn btn-primary btn-full" id="btn-submit-login">
           <i class="fa-solid fa-right-to-bracket"></i> Access Control Center
         </button>
+
+        <div style="text-align: center; font-size: 12px; margin-top: 10px; color: var(--text-muted);">
+          Don't have an account? <a href="#" id="btn-show-register" style="color: var(--color-green); font-weight: 600; text-decoration: none;">Register here</a>
+        </div>
       </form>
     </div>
+
+    <!-- REGISTER CARD -->
+    <div class="login-card glass-card border-glow-purple animate-fade-in hidden" id="register-card">
+      <div class="login-brand">
+        <div class="logo-icon" style="background: var(--color-purple-dim); border-color: rgba(139, 92, 246, 0.3); box-shadow: 0 0 10px var(--color-purple-glow);">
+          <i class="fa-solid fa-user-plus text-glow-purple"></i>
+        </div>
+        <div class="brand-name">
+          <span class="brand-eco">EcoSphere</span>
+          <span class="brand-ai" style="color: var(--color-purple); text-shadow: 0 0 10px var(--color-purple-glow);">AI</span>
+        </div>
+      </div>
+      <div class="login-tagline" style="color: var(--color-purple);">CREATE ENTERPRISE PILOT</div>
+      
+      <form id="register-form" class="login-form">
+        <div class="form-group">
+          <label for="register-name"><i class="fa-solid fa-user"></i> Full Name</label>
+          <input type="text" id="register-name" required placeholder="John Doe" class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label for="register-email"><i class="fa-solid fa-envelope"></i> Email Address</label>
+          <input type="email" id="register-email" required placeholder="john.doe@ecosphere.ai" class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label for="register-dept"><i class="fa-solid fa-building"></i> Department</label>
+          <select id="register-dept" required class="form-input" style="background-color: #0b0f19;">
+            <option value="HQ Command">HQ Command</option>
+            <option value="Logistics & Fleet">Logistics & Fleet</option>
+            <option value="Manufacturing & Ops">Manufacturing & Ops</option>
+            <option value="R&D & Facilities">R&D & Facilities</option>
+            <option value="Sales & Commute">Sales & Commute</option>
+            <option value="HR & Administration">HR & Administration</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="register-password"><i class="fa-solid fa-lock"></i> Password (min 8 characters)</label>
+          <input type="password" id="register-password" required minlength="8" placeholder="••••••••" class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label for="register-confirm-password"><i class="fa-solid fa-lock"></i> Confirm Password</label>
+          <input type="password" id="register-confirm-password" required minlength="8" placeholder="••••••••" class="form-input">
+        </div>
+        
+        <div id="register-error" class="login-error-msg hidden" style="background-color: var(--color-crimson-dim); border-color: rgba(239, 68, 68, 0.25); color: var(--color-crimson);">
+          <i class="fa-solid fa-circle-exclamation"></i> Error message here.
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-full" id="btn-submit-register" style="background-color: var(--color-purple); box-shadow: 0 0 15px var(--color-purple-glow); color: var(--text-main); border-color: rgba(139, 92, 246, 0.3);">
+          <i class="fa-solid fa-user-check"></i> Register & Login
+        </button>
+        
+        <div style="text-align: center; font-size: 12px; margin-top: 10px; color: var(--text-muted);">
+          Already have an account? <a href="#" id="btn-show-login" style="color: var(--color-purple); font-weight: 600; text-decoration: none;">Login here</a>
+        </div>
+      </form>
+    </div>
+
   </div>
 
   <script src="script.js"></script>
