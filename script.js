@@ -305,6 +305,11 @@ function initButtons() {
   if (btnRun) {
     btnRun.addEventListener("click", () => {
       console.log("Button Clicked: Run Carbon Simulation");
+      const role = getCurrentRole();
+      if (role === "Employee") {
+        showToast("Access Denied: Simulation triggers require Manager privileges or higher.", "error");
+        return;
+      }
       simulateOperations(true);
     });
   }
@@ -314,6 +319,11 @@ function initButtons() {
   if (btnOpt) {
     btnOpt.addEventListener("click", () => {
       console.log("Button Clicked: Optimize Fleet");
+      const role = getCurrentRole();
+      if (role === "Employee") {
+        showToast("Access Denied: Fleet optimizations require Manager privileges or higher.", "error");
+        return;
+      }
       applyAIOptimization('fleet');
     });
   }
@@ -323,6 +333,11 @@ function initButtons() {
   if (btnAudit) {
     btnAudit.addEventListener("click", () => {
       console.log("Button Clicked: Action Audit");
+      const role = getCurrentRole();
+      if (role === "Employee" || role === "Manager") {
+        showToast("Access Denied: Compliance audits require Sustainability Officer or Admin privileges.", "error");
+        return;
+      }
       applyAIOptimization('audit');
     });
   }
@@ -332,6 +347,11 @@ function initButtons() {
   if (btnReset) {
     btnReset.addEventListener("click", () => {
       console.log("Button Clicked: Reset Dashboard");
+      const role = getCurrentRole();
+      if (role === "Employee") {
+        showToast("Access Denied: Resetting filters requires Manager privileges or higher.", "error");
+        return;
+      }
       resetFilters();
     });
   }
@@ -1127,6 +1147,34 @@ function showToast(message, type = "info") {
   }, 4500);
 }
 
+// --- Role Management Helpers ---
+function getCurrentRole() {
+  const savedUser = localStorage.getItem("currentUser");
+  if (!savedUser) return "Admin";
+  try {
+    const user = JSON.parse(savedUser);
+    return user.role || "Admin";
+  } catch (e) {
+    return "Admin";
+  }
+}
+
+function applyRolePermissions() {
+  const role = getCurrentRole();
+  console.log("applyRolePermissions() - current role:", role);
+  
+  const sliderFleet = document.getElementById("slider-fleet");
+  const sliderRenewables = document.getElementById("slider-renewables");
+  const sliderHvac = document.getElementById("slider-hvac");
+
+  if (sliderFleet) sliderFleet.disabled = (role === "Employee");
+  if (sliderRenewables) sliderRenewables.disabled = (role === "Employee");
+  if (sliderHvac) sliderHvac.disabled = (role === "Employee");
+}
+
+window.getCurrentRole = getCurrentRole;
+window.applyRolePermissions = applyRolePermissions;
+
 // --- Session & Authentication Gateway ---
 function initLogin() {
   const loginForm = document.getElementById("login-form");
@@ -1149,6 +1197,7 @@ function initLogin() {
   const registerName = document.getElementById("register-name");
   const registerEmail = document.getElementById("register-email");
   const registerDept = document.getElementById("register-dept");
+  const registerRole = document.getElementById("register-role");
   const registerPassword = document.getElementById("register-password");
   const registerConfirmPassword = document.getElementById("register-confirm-password");
   const registerError = document.getElementById("register-error");
@@ -1159,7 +1208,7 @@ function initLogin() {
   const syncCurrentUserProfile = () => {
     const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
     if (isLoggedIn) {
-      let user = { name: "Administrator", department: "HQ Command" };
+      let user = { name: "Administrator", department: "HQ Command", role: "Admin" };
       const savedUser = localStorage.getItem("currentUser");
       if (savedUser) {
         try {
@@ -1173,11 +1222,18 @@ function initLogin() {
 
       const elHeaderName = document.getElementById("header-user-name");
       const elHeaderDept = document.getElementById("header-user-dept");
+      const elHeaderRole = document.getElementById("header-user-role");
       const elProfileName = document.getElementById("profile-user-name");
+      const elProfileRole = document.getElementById("profile-user-role");
 
       if (elHeaderName) elHeaderName.textContent = user.name;
       if (elHeaderDept) elHeaderDept.textContent = user.department;
+      if (elHeaderRole) elHeaderRole.textContent = user.role || "Admin";
       if (elProfileName) elProfileName.textContent = user.name;
+      if (elProfileRole) elProfileRole.textContent = user.role || "Admin";
+
+      // Apply range slider input locks
+      applyRolePermissions();
     }
   };
 
@@ -1248,7 +1304,7 @@ function initLogin() {
 
     // Check admin
     if (email === "admin@ecosphere.ai" && password === "admin123") {
-      authUser = { name: "Administrator", email: "admin@ecosphere.ai", department: "HQ Command" };
+      authUser = { name: "Administrator", email: "admin@ecosphere.ai", department: "HQ Command", role: "Admin" };
     } else {
       // Check registered users
       const users = getRegisteredUsers();
@@ -1296,7 +1352,7 @@ function initLogin() {
 
     console.log("performRegistration() triggered");
 
-    if (!registerName || !registerEmail || !registerDept || !registerPassword || !registerConfirmPassword) {
+    if (!registerName || !registerEmail || !registerDept || !registerRole || !registerPassword || !registerConfirmPassword) {
       console.error("Critical: One or more registration inputs are missing from DOM.");
       return;
     }
@@ -1304,11 +1360,12 @@ function initLogin() {
     const name = registerName.value.trim();
     const email = registerEmail.value.trim().toLowerCase();
     const dept = registerDept.value;
+    const role = registerRole.value;
     const pwd = registerPassword.value;
     const pwdConfirm = registerConfirmPassword.value;
 
     // Required check
-    if (!name || !email || !dept || !pwd || !pwdConfirm) {
+    if (!name || !email || !dept || !role || !pwd || !pwdConfirm) {
       showRegisterError("All fields are required.");
       return;
     }
@@ -1344,7 +1401,8 @@ function initLogin() {
       name: name,
       email: email,
       department: dept,
-      password: pwd, // Storing password for diagnostic login matching
+      role: role,
+      password: pwd,
       registeredAt: new Date().toISOString()
     };
 
