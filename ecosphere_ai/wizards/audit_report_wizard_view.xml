@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ecosphere_audit_report_wizard_form" model="ir.ui.view">
+        <name>ecosphere.audit.report.wizard.form</name>
+        <model>ecosphere.audit.report.wizard</model>
+        <arch type="xml">
+            <form string="Generate ESG Performance Summary">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group>
+                        <field name="department_id" options="{'no_create': True}"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_print_pdf" string="Export QWeb PDF" type="object" class="oe_highlight"/>
+                    <button string="Discard" class="btn btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </arch>
+    </record>
+
+    <record id="action_ecosphere_audit_report_wizard" model="ir.actions.act_window">
+        <name>ESG Report Builder</name>
+        <res_model>ecosphere.audit.report.wizard</res_model>
+        <view_mode>form</view_mode>
+        <target>new</target>
+    </record>
+
+    <menuitem id="menu_ecosphere_report_wizard" name="ESG Report Builder" parent="menu_ecosphere_governance" action="action_ecosphere_audit_report_wizard" sequence="40"/>
+</odoo>
