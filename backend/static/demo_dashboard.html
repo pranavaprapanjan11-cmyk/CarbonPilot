@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoSphere AI - ESG Digital Twin Command Center</title>
+    <!-- FontAwesome for Premium Enterprise Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Embedded Sleek Black Enterprise Glassmorphism CSS Styles -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --bg-main: #000000;
+            --bg-secondary: #0A0A0A;
+            --card-bg: rgba(20, 20, 20, 0.95);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --primary: #00C853;
+            --primary-glow: rgba(0, 200, 83, 0.15);
+            --secondary: #00E5FF;
+            --secondary-glow: rgba(0, 229, 255, 0.15);
+            --accent: #2E7D32;
+            --text-primary: #FFFFFF;
+            --text-secondary: #E5E7EB;
+            --text-muted: #B0B0B0;
+            --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            --danger: #FF3366;
+            --warning: #FF9F43;
+        }
+
+        /* Force White Text Globally */
+        * {
+            color: #FFFFFF !important;
+        }
+
+        /* Base Styles */
+        html,
+        body {
+            background-color: var(--bg-main) !important;
+            background-image: none !important;
+            margin: 0;
+            color: var(--text-primary) !important;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .ecosphere-dash-wrapper {
+            background-color: var(--bg-main) !important;
+            color: var(--text-primary) !important;
+            font-family: 'Inter', sans-serif;
+            padding: 24px;
+            min-height: 100vh;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        .ecosphere-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 16px;
+        }
+
+        .ecosphere-brand h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin: 0;
+            background: linear-gradient(135deg, #00E5FF 0%, #00C853 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Glassmorphism Cards */
+        .eco-card {
+            background: var(--card-bg) !important;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border) !important;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow) !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .eco-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px -5px rgba(0, 0, 0, 0.95), 0 0 15px rgba(0, 229, 255, 0.15) !important;
+            border-color: rgba(0, 229, 255, 0.3) !important;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 18px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Layout Grids */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .dashboard-hero-row {
+            display: grid;
+            grid-template-columns: 2.7fr 1.3fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .dashboard-details-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        /* Circular Progress bar */
+        .score-circle-wrapper {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .score-container {
+            text-align: center;
+            position: relative;
+            width: 120px;
+        }
+
+        .score-svg {
+            width: 120px;
+            height: 120px;
+            transform: rotate(-90deg);
+        }
+
+        .score-circle-bg {
+            fill: none;
+            stroke: rgba(255,255,255,0.05);
+            stroke-width: 8;
+        }
+
+        .score-circle-val {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .score-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .score-label {
+            margin-top: 10px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* Colors for scores */
+        .color-esg { stroke: var(--secondary); filter: drop-shadow(0 0 4px var(--secondary-glow)); }
+        .color-e { stroke: var(--primary); filter: drop-shadow(0 0 4px var(--primary-glow)); }
+        .color-s { stroke: #FF9F43; filter: drop-shadow(0 0 4px rgba(255, 159, 67, 0.2)); }
+        .color-g { stroke: #A78BFA; filter: drop-shadow(0 0 4px rgba(167, 139, 250, 0.2)); }
+
+        /* KPI Blocks */
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 5px 0;
+        }
+
+        /* Rankings Leaderboard */
+        .ranking-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .ranking-name-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .rank-badge {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .rank-1 { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); }
+        .rank-2 { background: linear-gradient(135deg, #C0C0C0 0%, #808080 100%); }
+        .rank-3 { background: linear-gradient(135deg, #CD7F32 0%, #8B4513 100%); }
+        .rank-other { background: rgba(255, 255, 255, 0.08); }
+
+        .ranking-score {
+            font-weight: 700;
+        }
+
+        /* Carbon Heat Map */
+        .heatmap-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        .heatmap-cell {
+            padding: 15px 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .cell-high { background: rgba(239, 68, 68, 0.15) !important; border-color: rgba(239, 68, 68, 0.35) !important; }
+        .cell-medium { background: rgba(245, 158, 11, 0.1) !important; border-color: rgba(245, 158, 11, 0.25) !important; }
+        .cell-low { background: rgba(16, 185, 129, 0.12) !important; border-color: rgba(16, 185, 129, 0.3) !important; }
+
+        /* AI Recommendation Widget */
+        .ai-cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ai-card {
+            background: rgba(30, 41, 59, 0.3);
+            border-left: 4px solid var(--secondary);
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 13px;
+            line-height: 1.5;
+            transition: transform 0.2s;
+        }
+
+        .ai-card:hover {
+            transform: scale(1.01);
+        }
+
+        .ai-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        /* Additional Standalone Tweaks */
+        .toast-notification {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--card-border);
+            border-left: 4px solid var(--primary);
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            transform: translateY(150%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .toast-show {
+            transform: translateY(0);
+        }
+        .interactive-btn {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
+            border: none;
+            font-weight: 600;
+            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .interactive-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+        .interactive-btn-secondary {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--card-border);
+        }
+        .interactive-btn-secondary:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .reward-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .reward-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+        .reward-card:hover {
+            border-color: var(--secondary);
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .reward-title {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .reward-cost {
+            font-weight: 700;
+            font-size: 12px;
+            margin: 4px 0 8px 0;
+        }
+        .interactive-cell {
+            cursor: pointer;
+        }
+        .interactive-cell:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .active-filter-badge {
+            background: rgba(0, 229, 255, 0.15);
+            border: 1px solid var(--secondary);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .dashboard-hero-row {
+                grid-template-columns: 1fr;
+            }
+            .dashboard-details-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .ecosphere-dash-wrapper {
+                padding: 12px;
+            }
+            .heatmap-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ecosphere-dash-wrapper">
+        <!-- HEADER -->
+        <div class="ecosphere-header">
+            <div class="ecosphere-brand">
+                <h1><i class="fa fa-globe"></i> EcoSphere AI</h1>
+                <p>ESG Digital Twin Command Center &amp; Sustainability Advisor</p>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <span class="active-filter-badge" id="filterBadge">
+                    <i class="fa fa-filter"></i> Scope: All Departments
+                </span>
+                <button class="interactive-btn" onclick="simulateOperations()">
+                    <i class="fa fa-play"></i> Run Carbon Simulation
+                </button>
+                <button class="interactive-btn interactive-btn-secondary" onclick="resetDashboard()">
+                    <i class="fa fa-refresh"></i> Reset View
+                </button>
+            </div>
+        </div>
+
+        <!-- ESG SCORING CARDS GRID -->
+        <div class="dashboard-grid">
+            <div class="eco-card">
+                <div class="card-title">Overall ESG Score <i class="fa fa-shield"></i></div>
+                <div class="score-circle-wrapper">
+                    <div class="score-container">
+                        <svg class="score-svg">
+                            <circle class="score-circle-bg" cx="60" cy="60" r="50" fill="none"></circle>
+                            <circle class="score-circle-val color-esg" id="esgCircle" cx="60" cy="60" r="50" fill="none" stroke-dasharray="314.16" stroke-dashoffset="69.11"></circle>
+                        </svg>
+                        <div class="score-text" id="esgText">--</div>
+                        <div class="score-label">ESG Rating</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="eco-card">
+                <div class="card-title">Environmental Score <i class="fa fa-leaf"></i></div>
+                <div class="score-circle-wrapper">
+                    <div class="score-container">
+                        <svg class="score-svg">
+                            <circle class="score-circle-bg" cx="60" cy="60" r="50" fill="none"></circle>
+                            <circle class="score-circle-val color-e" id="envCircle" cx="60" cy="60" r="50" fill="none" stroke-dasharray="314.16" stroke-dashoffset="56.54"></circle>
+                        </svg>
+                        <div class="score-text" id="envText">--</div>
+                        <div class="score-label">E Pillar (40%)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="eco-card">
+                <div class="card-title">Social Score <i class="fa fa-users"></i></div>
+                <div class="score-circle-wrapper">
+                    <div class="score-container">
+                        <svg class="score-svg">
+                            <circle class="score-circle-bg" cx="60" cy="60" r="50" fill="none"></circle>
+                            <circle class="score-circle-val color-s" id="socCircle" cx="60" cy="60" r="50" fill="none" stroke-dasharray="314.16" stroke-dashoffset="91.10"></circle>
+                        </svg>
+                        <div class="score-text" id="socText">--</div>
+                        <div class="score-label">S Pillar (30%)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="eco-card">
+                <div class="card-title">Governance Score <i class="fa fa-gavel"></i></div>
+                <div class="score-circle-wrapper">
+                    <div class="score-container">
+                        <svg class="score-svg">
+                            <circle class="score-circle-bg" cx="60" cy="60" r="50" fill="none"></circle>
+                            <circle class="score-circle-val color-g" id="govCircle" cx="60" cy="60" r="50" fill="none" stroke-dasharray="314.16" stroke-dashoffset="69.11"></circle>
+                        </svg>
+                        <div class="score-text" id="govText">--</div>
+                        <div class="score-label">G Pillar (30%)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HERO CHART AND LEADERS -->
+        <div class="dashboard-hero-row">
+            <!-- EMISSIONS TREND CHART -->
+            <div class="eco-card">
+                <div class="card-title">
+                    Carbon Emissions Trend &amp; Target Limits
+                    <div style="font-size:12px; text-transform:none;">
+                        Total YTD: <strong class="text-success" id="ytdEmissions">--</strong> tCO2e
+                    </div>
+                </div>
+                <div style="position: relative; height: 320px; width: 100%;">
+                    <canvas id="carbonTrendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- DEPARTMENT LEADERBOARD -->
+            <div class="eco-card">
+                <div class="card-title">Department Leaderboard <i class="fa fa-trophy"></i></div>
+                <div class="ranking-list" id="deptLeaderboard">
+                    <!-- Dynamic -->
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM DETAILS ROW -->
+        <div class="dashboard-details-row">
+            <!-- AI ADVISOR RECOMMENDATIONS -->
+            <div class="eco-card">
+                <div class="card-title">AI Sustainability Advisor <i class="fa fa-lightbulb-o"></i></div>
+                <div class="ai-cards-container" id="aiInsightsBox">
+                    <!-- Dynamic -->
+                </div>
+            </div>
+
+            <!-- CARBON HEAT MAP -->
+            <div class="eco-card">
+                <div class="card-title">Carbon Concentration Map <i class="fa fa-th"></i></div>
+                <div class="heatmap-container" id="carbonHeatmap">
+                    <!-- Dynamic -->
+                </div>
+            </div>
+
+            <!-- REWARDS MARKETPLACE -->
+            <div class="eco-card">
+                <div class="card-title">
+                    Gamification &amp; Rewards Shop
+                    <div style="font-size:12px; text-transform:none;">
+                        Your XP: <strong class="text-success" id="employeeXP">--</strong>
+                    </div>
+                </div>
+                <div class="reward-grid" id="rewardStore">
+                    <!-- Dynamic -->
+                </div>
+            </div>
+        </div>
+
+        <!-- CHALLENGE CARD SLIDES -->
+        <div class="eco-card" style="margin-top:24px;">
+            <div class="card-title">Active Environmental Challenges <i class="fa fa-calendar-check-o"></i></div>
+            <div style="display:flex; justify-content:space-around; gap:20px; flex-wrap:wrap;" id="challengesBox">
+                <!-- Dynamic -->
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION WIDGET -->
+    <div class="toast-notification" id="toastBox">
+        <i class="fa fa-check-circle-o" style="color:var(--primary); font-size:20px;"></i>
+        <div>
+            <strong style="display:block; font-size:13px;" id="toastTitle">Success!</strong>
+            <span style="font-size:12px;" id="toastMsg">Action processed.</span>
+        </div>
+    </div>
+
+    <!-- PURE FULL-STACK FETCH JAVASCRIPT CONNECTORS -->
+    <script>
+        // High-fidelity baseline datasets for initial render & offline simulation fallback
+        const BASE_DEPARTMENTS = [
+            { name: 'Administration', esg: 88, env: 90, soc: 85, gov: 90, carbon: 180.0, target: 200.0 },
+            { name: 'Finance & Acc.', esg: 78, env: 80, soc: 75, gov: 80, carbon: 140.0, target: 150.0 },
+            { name: 'Research & Dev.', esg: 85, env: 88, soc: 80, gov: 88, carbon: 220.0, target: 250.0 },
+            { name: 'Product Eng.', esg: 94, env: 96, soc: 90, gov: 96, carbon: 310.0, target: 400.0 },
+            { name: 'Sales & Mktg.', esg: 72, env: 75, soc: 70, gov: 72, carbon: 120.0, target: 130.0 },
+            { name: 'Customer Success', esg: 80, env: 82, soc: 78, gov: 80, carbon: 90.0, target: 100.0 },
+            { name: 'Global Logistics', esg: 48, env: 40, soc: 50, gov: 55, carbon: 480.0, target: 350.0 },
+            { name: 'Manufacturing', esg: 62, env: 58, soc: 65, gov: 64, carbon: 410.0, target: 380.0 },
+            { name: 'Legal & Risk', esg: 90, env: 92, soc: 88, gov: 90, carbon: 50.0, target: 70.0 },
+            { name: 'IT Infrastructure', esg: 84, env: 86, soc: 82, gov: 84, carbon: 280.0, target: 300.0 }
+        ];
+
+        const BASE_REWARDS = [
+            { id: 1, name: 'Extra Paid Leave Day', cost: 1000, stock: 4 },
+            { id: 2, name: '$20 Amazon Gift Card', cost: 300, stock: 12 },
+            { id: 3, name: 'Premium Coffee Mug', cost: 150, stock: 8 },
+            { id: 4, name: 'Tree Dedication planting', cost: 200, stock: 24 }
+        ];
+
+        const BASE_CHALLENGES = [
+            { id: 1, title: 'Cycle to Work Month', description: 'Earn 500 XP. 42 enrolled.', icon: 'bicycle' },
+            { id: 2, title: 'Paperless Office Campaign', description: 'Earn 200 XP. 87 enrolled.', icon: 'file-text-o' },
+            { id: 3, title: 'Zero Carbon Weekend', description: 'Earn 350 XP. 14 enrolled.', icon: 'plug' }
+        ];
+
+        const BASE_CARBON_DATA = [
+            { month: 'Jan', emissions: 195, target: 170 },
+            { month: 'Feb', emissions: 182, target: 165 },
+            { month: 'Mar', emissions: 170, target: 160 },
+            { month: 'Apr', emissions: 165, target: 155 },
+            { month: 'May', emissions: 155, target: 150 },
+            { month: 'Jun', emissions: 142, target: 145 },
+            { month: 'Jul', emissions: 138, target: 140 },
+            { month: 'Aug', emissions: 140, target: 135 },
+            { month: 'Sep', emissions: 132, target: 130 },
+            { month: 'Oct', emissions: 125, target: 125 },
+            { month: 'Nov', emissions: 118, target: 120 },
+            { month: 'Dec', emissions: 110, target: 115 }
+        ];
+
+        const BASE_INSIGHTS = [
+            { id: 1, type: 'fleet', category: 'Environmental fleet', impact: '18% Reduction', text: 'Department \'Global Logistics\' is exceeding carbon budget limits by 130 tCO2e. Recommending switching 30% of their operational fleet vehicles to Electric Vehicles (EVs).', is_applied: false },
+            { id: 2, type: 'audits', category: 'Governance compliance', impact: '12% Rating Rise', text: 'Detected 6 overdue audit filings in Manufacturing. Directing notifications to remediation owners will lower risks and raise compliance ratings.', is_applied: false }
+        ];
+
+        // Seed default hybrid state values instantly
+        let dbState = {
+            esg: 78,
+            env: 82,
+            soc: 71,
+            gov: 78,
+            ytd_emissions: 1845.2,
+            xp: 1250,
+            departments: JSON.parse(JSON.stringify(BASE_DEPARTMENTS)),
+            rewards: JSON.parse(JSON.stringify(BASE_REWARDS)),
+            challenges: JSON.parse(JSON.stringify(BASE_CHALLENGES)),
+            carbon_data: JSON.parse(JSON.stringify(BASE_CARBON_DATA)),
+            insights: JSON.parse(JSON.stringify(BASE_INSIGHTS)),
+            joined_challenges: []
+        };
+
+        let activeFilter = 'All';
+        let chartInstance = null;
+
+        window.onload = async function() {
+            console.log("EcoSphere AI: Bootstrapping Hybrid Engine...");
+            // Render baseline mockup data immediately so no dashboard widget is ever empty
+            renderUI();
+            
+            // Asynchronously fetch live database data from FastAPI
+            try {
+                await ensureAuthenticated();
+                await reloadData();
+            } catch(e) {
+                console.warn("FastAPI API is offline, continuing to run in standalone simulator mode.", e);
+            }
+        };
+
+        // Bypasses login form by automatically requesting a token with default demo credentials
+        async function ensureAuthenticated() {
+            let token = localStorage.getItem("token");
+            if (!token) {
+                console.log("Authenticating with default demo credentials...");
+                let form = new URLSearchParams();
+                form.append("username", "admin@ecosphere.ai");
+                form.append("password", "adminpass");
+                
+                let res = await fetch("/auth/token", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: form
+                });
+                if (res.ok) {
+                    let data = await res.json();
+                    localStorage.setItem("token", data.access_token);
+                    console.log("Token acquired successfully.");
+                } else {
+                    console.error("Default authentication failed.");
+                }
+            }
+        }
+
+        async function apiRequest(path, options = {}) {
+            let token = localStorage.getItem("token");
+            options.headers = options.headers || {};
+            if (token) {
+                options.headers["Authorization"] = "Bearer " + token;
+            }
+            let res = await fetch(path, options);
+            if (res.status === 401) {
+                localStorage.removeItem("token");
+                await ensureAuthenticated();
+                return apiRequest(path, options);
+            }
+            return res;
+        }
+
+        async function reloadData() {
+            try {
+                let res = await apiRequest("/api/dashboard");
+                if (res.ok) {
+                    dbState = await res.json();
+                    renderUI();
+                } else {
+                    console.warn("FastAPI returned error payload, running simulator in memory.");
+                }
+            } catch(e) {
+                console.warn("Connection to FastAPI server lost, running simulator in memory.");
+            }
+        }
+
+        function renderUI() {
+            // Update User XP
+            document.getElementById('employeeXP').innerText = dbState.xp ? dbState.xp.toLocaleString() : "0";
+            
+            // Calculate active averages based on filters
+            let current = {};
+            let ytdValue = 0;
+            if (activeFilter === 'All') {
+                current = {
+                    esg: dbState.esg,
+                    env: dbState.env,
+                    soc: dbState.soc,
+                    gov: dbState.gov
+                };
+                ytdValue = dbState.ytd_emissions;
+            } else {
+                let d = dbState.departments ? dbState.departments.find(x => x.name === activeFilter) : null;
+                if (d) {
+                    current = { esg: d.esg, env: d.env, soc: d.soc, gov: d.gov };
+                    ytdValue = d.carbon;
+                } else {
+                    current = { esg: dbState.esg, env: dbState.env, soc: dbState.soc, gov: dbState.gov };
+                    ytdValue = dbState.ytd_emissions;
+                }
+            }
+
+            // Update score progress circles
+            updateCircularGauge('esgCircle', 'esgText', current.esg || 0);
+            updateCircularGauge('envCircle', 'envText', current.env || 0);
+            updateCircularGauge('socCircle', 'socText', current.soc || 0);
+            updateCircularGauge('govCircle', 'govText', current.gov || 0);
+            document.getElementById('ytdEmissions').innerText = ytdValue ? ytdValue.toLocaleString() : "0";
+
+            renderLeaderboard();
+            renderHeatmap();
+            renderInsights();
+            renderRewards();
+            renderChallenges();
+            updateChart();
+        }
+
+        function updateCircularGauge(circleId, textId, scoreValue) {
+            let circle = document.getElementById(circleId);
+            if (circle) {
+                let offset = 314.16 - (314.16 * scoreValue / 100);
+                circle.style.strokeDashoffset = offset;
+            }
+            let text = document.getElementById(textId);
+            if (text) text.innerText = scoreValue;
+        }
+
+        function renderLeaderboard() {
+            if (!dbState.departments) return;
+            let sorted = [...dbState.departments].sort((a, b) => b.esg - a.esg);
+            let lb = document.getElementById('deptLeaderboard');
+            lb.innerHTML = '';
+            
+            sorted.forEach((d, idx) => {
+                let rankClass = 'rank-other';
+                if (idx === 0) rankClass = 'rank-1';
+                else if (idx === 1) rankClass = 'rank-2';
+                else if (idx === 2) rankClass = 'rank-3';
+
+                let activeStyle = d.name === activeFilter ? 'border: 1px solid var(--secondary) !important; background: rgba(0, 229, 255, 0.08) !important;' : '';
+
+                lb.innerHTML += `
+                    <div class="ranking-item" style="${activeStyle}">
+                        <div class="ranking-name-box">
+                            <span class="rank-badge ${rankClass}">${idx + 1}</span>
+                            <span style="font-size: 13px;">${d.name}</span>
+                        </div>
+                        <strong class="ranking-score">${d.esg} pts</strong>
+                    </div>
+                `;
+            });
+        }
+
+        function renderHeatmap() {
+            if (!dbState.departments) return;
+            let hm = document.getElementById('carbonHeatmap');
+            hm.innerHTML = '';
+            
+            dbState.departments.forEach(d => {
+                let heatClass = 'cell-low';
+                if (d.carbon > d.target) {
+                    heatClass = 'cell-high';
+                } else if (d.carbon > d.target * 0.8) {
+                    heatClass = 'cell-medium';
+                }
+
+                let borderStyle = d.name === activeFilter ? 'outline: 2px solid var(--secondary) !important; outline-offset: -2px;' : '';
+
+                hm.innerHTML += `
+                    <div class="heatmap-cell ${heatClass} interactive-cell" style="${borderStyle}" onclick="filterByDept('${d.name}')">
+                        <strong style="display:block; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${d.name}</strong>
+                        <span>${d.carbon} t</span>
+                    </div>
+                `;
+            });
+        }
+
+        function renderInsights() {
+            if (!dbState.insights) return;
+            let ib = document.getElementById('aiInsightsBox');
+            ib.innerHTML = '';
+            
+            dbState.insights.forEach(ins => {
+                let isApplied = ins.is_applied;
+                let opacityStyle = isApplied ? 'opacity: 0.5; pointer-events: none;' : '';
+                let btnText = isApplied ? 'Implemented' : ins.type === 'fleet' ? 'Optimize Fleet' : 'Action Audits';
+                let btnStyle = isApplied ? 'background: #334155 !important; cursor: not-allowed !important;' : '';
+
+                ib.innerHTML += `
+                    <div class="ai-card" id="${ins.type}InsightCard" style="${opacityStyle}">
+                        <div class="ai-meta">
+                            <span>${ins.category}</span>
+                            <span class="text-success">${ins.impact}</span>
+                        </div>
+                        <div class="ai-text">${ins.text}</div>
+                        <div style="margin-top:10px; text-align:right;">
+                            <button class="interactive-btn" style="${btnStyle}" ${isApplied ? 'disabled' : ''} onclick="applyAIOptimization('${ins.type}')">${btnText}</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderRewards() {
+            if (!dbState.rewards) return;
+            let store = document.getElementById('rewardStore');
+            store.innerHTML = '';
+            
+            dbState.rewards.forEach(r => {
+                let isAffordable = dbState.xp >= r.cost;
+                let hasStock = r.stock > 0;
+                let btnHtml = (hasStock && isAffordable)
+                    ? `<button class="interactive-btn" style="padding:4px 8px; font-size:10px;" onclick="redeemReward(${r.id})">Claim</button>`
+                    : `<button class="interactive-btn interactive-btn-secondary" style="padding:4px 8px; font-size:10px; opacity:0.5; cursor:not-allowed;" disabled>${!hasStock ? 'Sold Out' : 'Claim'}</button>`;
+
+                store.innerHTML += `
+                    <div class="reward-card">
+                        <div>
+                            <div class="reward-title">${r.name}</div>
+                            <div class="reward-cost">${r.cost} XP</div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px;">
+                            <span>Stock: ${r.stock}</span>
+                            ${btnHtml}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderChallenges() {
+            if (!dbState.challenges) return;
+            let cb = document.getElementById('challengesBox');
+            cb.innerHTML = '';
+            
+            dbState.challenges.forEach(c => {
+                let hasJoined = dbState.joined_challenges ? dbState.joined_challenges.includes(c.id) : false;
+                let btnText = hasJoined ? "Joined" : "Join Challenge";
+                let btnClass = hasJoined ? "interactive-btn interactive-btn-secondary" : "interactive-btn";
+                let cursorStyle = hasJoined ? "cursor: not-allowed !important;" : "";
+
+                cb.innerHTML += `
+                    <div style="flex:1; background:rgba(255,255,255,0.02); padding:16px; border-radius:12px; border:1px solid var(--card-border); text-align:center; min-width: 180px;">
+                        <div style="font-size:32px; color:var(--secondary); margin-bottom:8px;"><i class="fa fa-${c.icon}"></i></div>
+                        <div style="font-weight:700; margin-bottom:4px;">${c.title}</div>
+                        <div style="font-size:12px; margin-bottom:12px;">${c.description}</div>
+                        <button class="${btnClass}" style="${cursorStyle}" ${hasJoined ? 'disabled' : ''} onclick="joinChallenge(${c.id})">${btnText}</button>
+                    </div>
+                `;
+            });
+        }
+
+        // Mappings for charts
+        function updateChart() {
+            if (!dbState.carbon_data) return;
+            let months = dbState.carbon_data.map(c => c.month);
+            let emissions = dbState.carbon_data.map(c => c.emissions);
+            let targets = dbState.carbon_data.map(c => c.target);
+
+            if (activeFilter !== 'All' && dbState.departments) {
+                let dept = dbState.departments.find(d => d.name === activeFilter);
+                if (dept) {
+                    let totalCarbon = dbState.departments.reduce((acc, d) => acc + d.carbon, 0);
+                    let totalTarget = dbState.departments.reduce((acc, d) => acc + d.target, 0);
+                    
+                    let carbonRatio = dept.carbon / (totalCarbon || 1);
+                    let targetRatio = dept.target / (totalTarget || 1);
+
+                    emissions = emissions.map(v => Math.round(v * carbonRatio * 8.5));
+                    targets = targets.map(v => Math.round(v * targetRatio * 8.5));
+                }
+            }
+
+            if (!chartInstance) {
+                let canvas = document.getElementById('carbonTrendChart');
+                if (!canvas) return;
+                let ctx = canvas.getContext('2d');
+                chartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: 'Operational Emissions (tCO2e)',
+                            data: emissions,
+                            borderColor: '#00C853',
+                            backgroundColor: 'rgba(0, 200, 83, 0.05)',
+                            fill: true,
+                            tension: 0.4
+                        }, {
+                            label: 'Reduction Target Limit',
+                            data: targets,
+                            borderColor: '#FF3366',
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: '#FFFFFF' } }
+                        },
+                        scales: {
+                            x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#FFFFFF' } },
+                            y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#FFFFFF' } }
+                        }
+                    }
+                });
+            } else {
+                chartInstance.data.labels = months;
+                chartInstance.data.datasets[0].data = emissions;
+                chartInstance.data.datasets[1].data = targets;
+                chartInstance.update();
+            }
+        }
+
+        function recalculateCompanyAverages() {
+            let totalEsg = 0, totalEnv = 0, totalSoc = 0, totalGov = 0;
+            dbState.departments.forEach(d => {
+                totalEsg += d.esg;
+                totalEnv += d.env;
+                totalSoc += d.soc;
+                totalGov += d.gov;
+            });
+            dbState.esg = Math.round(totalEsg / dbState.departments.length);
+            dbState.env = Math.round(totalEnv / dbState.departments.length);
+            dbState.soc = Math.round(totalSoc / dbState.departments.length);
+            dbState.gov = Math.round(totalGov / dbState.departments.length);
+            dbState.ytd_emissions = dbState.departments.reduce((acc, d) => acc + d.carbon, 0);
+        }
+
+        // --- Core fullstack trigger functions ---
+        async function simulateOperations() {
+            console.log("simulateOperations triggered");
+            showToast("Simulating Operations", "Processing carbon ledger changes...");
+            try {
+                let res = await apiRequest("/api/simulation", { method: "POST" });
+                if (res.ok) {
+                    showToast("Simulation Complete", "New carbon transactions logged. ESG metrics updated.");
+                    await reloadData();
+                    return;
+                }
+            } catch(e) {
+                console.warn("API connection failed, falling back to local simulation engine.");
+            }
+
+            // Local fallback simulation
+            dbState.departments.forEach(d => {
+                let change = Math.floor(Math.random() * 25) - 12;
+                d.carbon = Math.max(10, d.carbon + change);
+                if (d.carbon <= d.target) {
+                    d.env = Math.min(100, d.env + Math.floor(Math.random() * 4));
+                } else {
+                    d.env = Math.max(20, d.env - Math.floor(Math.random() * 6));
+                }
+                d.soc = Math.max(30, Math.min(100, d.soc + (Math.random() > 0.45 ? 2 : -2)));
+                d.gov = Math.max(30, Math.min(100, d.gov + (Math.random() > 0.5 ? 1 : -2)));
+                d.esg = Math.round((d.env * 0.4) + (d.soc * 0.3) + (d.gov * 0.3));
+            });
+            dbState.carbon_data.forEach(c => {
+                c.emissions = Math.max(40, c.emissions + Math.floor(Math.random() * 11) - 5);
+            });
+            recalculateCompanyAverages();
+            showToast("Simulation (Offline)", "Operational logs simulated in memory.");
+            renderUI();
+        }
+
+        async function applyAIOptimization(type) {
+            console.log("applyAIOptimization triggered: " + type);
+            try {
+                let res = await apiRequest("/api/optimize/" + type, { method: "POST" });
+                if (res.ok) {
+                    showToast("Optimization Active", "ESG scoring parameter calculated (+G/E rating).");
+                    await reloadData();
+                    return;
+                }
+            } catch(e) {
+                console.warn("API connection failed, running local AI optimization fallback.");
+            }
+
+            // Local fallback optimization
+            let ins = dbState.insights.find(x => x.type === type);
+            if (ins && !ins.is_applied) {
+                if (type === "fleet") {
+                    let logistics = dbState.departments.find(d => d.name === "Global Logistics");
+                    if (logistics) {
+                        logistics.carbon = Math.max(50.0, logistics.carbon - 130.0);
+                        logistics.env = Math.min(100, logistics.env + 30);
+                        logistics.esg = Math.round((logistics.env * 0.4) + (logistics.soc * 0.3) + (logistics.gov * 0.3));
+                    }
+                } else if (type === "audits") {
+                    let mfg = dbState.departments.find(d => d.name === "Manufacturing");
+                    if (mfg) {
+                        mfg.gov = Math.min(100, mfg.gov + 25);
+                        mfg.esg = Math.round((mfg.env * 0.4) + (mfg.soc * 0.3) + (mfg.gov * 0.3));
+                    }
+                }
+                ins.is_applied = true;
+                recalculateCompanyAverages();
+                showToast("Applied (Offline)", `AI ${type} optimization complete.`);
+                renderUI();
+            }
+        }
+
+        async function joinChallenge(id) {
+            console.log("joinChallenge triggered: " + id);
+            try {
+                let res = await apiRequest("/api/challenges/" + id + "/join", { method: "POST" });
+                if (res.ok) {
+                    showToast("Enrolled in Challenge!", "+150 XP credited. Social engagement raised.");
+                    await reloadData();
+                    return;
+                }
+            } catch(e) {
+                console.warn("API connection failed, running local signup fallback.");
+            }
+
+            // Local fallback join
+            if (!dbState.joined_challenges.includes(id)) {
+                dbState.joined_challenges.push(id);
+                dbState.xp += 150;
+                let c = dbState.challenges.find(x => x.id === id);
+                if (c) c.participants += 1;
+                dbState.departments.forEach(d => {
+                    d.soc = Math.min(100, d.soc + 3);
+                    d.esg = Math.round((d.env * 0.4) + (d.soc * 0.3) + (d.gov * 0.3));
+                });
+                recalculateCompanyAverages();
+                showToast("Joined (Offline)", "+150 XP credited locally.");
+                renderUI();
+            }
+        }
+
+        async function redeemReward(id) {
+            console.log("redeemReward triggered: " + id);
+            try {
+                let res = await apiRequest("/api/rewards/" + id + "/redeem", { method: "POST" });
+                if (res.ok) {
+                    let data = await res.json();
+                    showToast("Redemption Confirmed!", data.message);
+                    await reloadData();
+                    return;
+                } else {
+                    let err = await res.json();
+                    showToast("Redemption Failed", err.detail || "Insufficient assets");
+                    return;
+                }
+            } catch(e) {
+                console.warn("API connection failed, running local redemption check.");
+            }
+
+            // Local fallback redemption
+            let r = dbState.rewards.find(x => x.id === id);
+            if (r) {
+                if (r.stock <= 0) {
+                    showToast("Redeem Error", "Item is out of stock.");
+                    return;
+                }
+                if (dbState.xp < r.cost) {
+                    showToast("Redeem Error", "Insufficient XP balance.");
+                    return;
+                }
+                dbState.xp -= r.cost;
+                r.stock -= 1;
+                showToast("Claimed (Offline)", `Deducted ${r.cost} XP.`);
+                renderUI();
+            }
+        }
+
+        async function resetDashboard() {
+            console.log("resetDashboard triggered");
+            showToast("Resetting Center", "Restoring all parameters to baseline database defaults...");
+            try {
+                let res = await apiRequest("/api/dashboard/reset", { method: "POST" });
+                if (res.ok) {
+                    activeFilter = 'All';
+                    document.getElementById('filterBadge').innerHTML = `<i class="fa fa-filter"></i> Scope: All Departments`;
+                    showToast("Dashboard Reset", "All ESG parameters and states restored to baseline.");
+                    await reloadData();
+                    return;
+                }
+            } catch(e) {
+                console.warn("API connection failed, resetting client variables locally.");
+            }
+
+            // Local fallback reset
+            dbState.departments = JSON.parse(JSON.stringify(BASE_DEPARTMENTS));
+            dbState.rewards = JSON.parse(JSON.stringify(BASE_REWARDS));
+            dbState.challenges = JSON.parse(JSON.stringify(BASE_CHALLENGES));
+            dbState.carbon_data = JSON.parse(JSON.stringify(BASE_CARBON_DATA));
+            dbState.insights = JSON.parse(JSON.stringify(BASE_INSIGHTS));
+            dbState.joined_challenges = [];
+            dbState.xp = 1250;
+            activeFilter = 'All';
+            document.getElementById('filterBadge').innerHTML = `<i class="fa fa-filter"></i> Scope: All Departments`;
+            recalculateCompanyAverages();
+            showToast("Reset (Offline)", "Client state variables restored to defaults.");
+            renderUI();
+        }
+
+        function filterByDept(deptName) {
+            console.log("filterByDept triggered: " + deptName);
+            if (activeFilter === deptName) {
+                resetFilters();
+                return;
+            }
+            activeFilter = deptName;
+            document.getElementById('filterBadge').innerHTML = `<i class="fa fa-filter"></i> Scope: ${deptName}`;
+            showToast("Filtered View", `Viewing detailed metrics for Department: ${deptName}.`);
+            renderUI();
+        }
+
+        function resetFilters() {
+            console.log("resetFilters triggered");
+            activeFilter = 'All';
+            document.getElementById('filterBadge').innerHTML = `<i class="fa fa-filter"></i> Scope: All Departments`;
+            showToast("View Restored", "Displaying company-wide ESG averages.");
+            renderUI();
+        }
+
+        function showToast(title, msg) {
+            let t = document.getElementById('toastBox');
+            document.getElementById('toastTitle').innerText = title;
+            document.getElementById('toastMsg').innerText = msg;
+            t.classList.add('toast-show');
+            setTimeout(() => {
+                t.classList.remove('toast-show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
