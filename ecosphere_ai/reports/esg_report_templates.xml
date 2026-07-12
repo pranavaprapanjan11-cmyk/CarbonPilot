@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- REGISTER REPORT ACTION -->
+    <record id="action_report_esg_summary" model="ir.actions.report">
+        <name>ESG Summary Report</name>
+        <model>ecosphere.audit.report.wizard</model>
+        <report_type>qweb-pdf</report_type>
+        <report_name>ecosphere_ai.report_esg_summary_template</report_name>
+        <report_file>ecosphere_ai.report_esg_summary_template</report_file>
+        <print_report_name>'ESG_Summary_Report_%s' % (object.date_from)</print_report_name>
+        <binding_model_id ref="model_ecosphere_audit_report_wizard"/>
+        <binding_type>report</binding_type>
+    </record>
+
+    <!-- QWEB TEMPLATE DEFINITION -->
+    <template id="report_esg_summary_template">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <div class="page" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333;">
+                    <!-- HEADER SECTION -->
+                    <div style="border-bottom: 2px solid #2E7D32; padding-bottom: 15px; margin-bottom: 30px;">
+                        <h2 style="color: #2E7D32; margin: 0; font-weight: bold; font-size: 26px;">EcoSphere AI</h2>
+                        <h4 style="color: #666; margin: 5px 0 0 0; font-weight: 300;">Intelligent ESG Management Platform</h4>
+                        <div style="text-align: right; margin-top: -45px; font-size: 12px; color: #777;">
+                            Report Generated: <span t-esc="datetime.datetime.now().strftime('%Y-%m-%d %H:%M')"/>
+                        </div>
+                    </div>
+
+                    <!-- META INFO -->
+                    <div class="row" style="margin-bottom: 30px; font-size: 14px;">
+                        <div class="col-6">
+                            <strong>Target Scope:</strong> <span t-esc="data.get('form_data').get('department_name')"/><br/>
+                            <strong>Evaluation Range:</strong> 
+                            <span t-esc="data.get('form_data').get('date_from')"/> to 
+                            <span t-esc="data.get('form_data').get('date_to')"/>
+                        </div>
+                        <div class="col-6 text-right">
+                            <strong>Compliance Auditor:</strong> System Automated<br/>
+                            <strong>Framework Standard:</strong> GHG Protocol &amp; ISO 14001
+                        </div>
+                    </div>
+
+                    <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #2E7D32; margin-top: 30px; font-size: 18px;">ESG KPI Summary Indicators</h3>
+                    
+                    <!-- KPI CARDS GRID -->
+                    <div style="display: flex; gap: 15px; margin-top: 15px; margin-bottom: 35px;">
+                        <div style="flex: 1; border: 1px solid #ddd; border-top: 4px solid #2E7D32; border-radius: 4px; padding: 15px; background: #fcfcfc; text-align: center;">
+                            <div style="font-size: 11px; text-transform: uppercase; color: #777; font-weight: bold;">Aggregate Carbon Footprint</div>
+                            <div style="font-size: 24px; font-weight: bold; color: #2E7D32; margin-top: 5px;">
+                                <t t-esc="data.get('total_emissions')"/> <span style="font-size: 12px;">tCO2e</span>
+                            </div>
+                        </div>
+                        <div style="flex: 1; border: 1px solid #ddd; border-top: 4px solid #0288D1; border-radius: 4px; padding: 15px; background: #fcfcfc; text-align: center;">
+                            <div style="font-size: 11px; text-transform: uppercase; color: #777; font-weight: bold;">Audited Transactions</div>
+                            <div style="font-size: 24px; font-weight: bold; color: #0288D1; margin-top: 5px;">
+                                <t t-esc="data.get('tx_count')"/> logs
+                            </div>
+                        </div>
+                        <div style="flex: 1; border: 1px solid #ddd; border-top: 4px solid #F57C00; border-radius: 4px; padding: 15px; background: #fcfcfc; text-align: center;">
+                            <div style="font-size: 11px; text-transform: uppercase; color: #777; font-weight: bold;">Resolved Compliance Risks</div>
+                            <div style="font-size: 24px; font-weight: bold; color: #F57C00; margin-top: 5px;">
+                                <t t-esc="data.get('resolved_compliance')"/> / 
+                                <t t-esc="data.get('open_compliance') + data.get('resolved_compliance')"/> issues
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- POLICY STATEMENT -->
+                    <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 5px; color: #2E7D32; font-size: 18px;">Sustainability Declaration</h3>
+                    <p style="font-size: 13px; line-height: 1.6; color: #555; text-align: justify;">
+                        The figures detailed above reflect the corporate sustainability ledger recorded in Odoo for the selected duration. 
+                        Environmental calculations are derived programmatically by applying active emission factors to registered manufacturing, procurement, fleet, and travel operations. Social and Governance scores are derived from policy sign-offs, CSR involvement metrics, and compliance remediation logs.
+                    </p>
+
+                    <!-- COMPLIANCE WARNING IF APPLICABLE -->
+                    <t t-if="data.get('open_compliance') &gt; 0">
+                        <div style="margin-top: 25px; padding: 15px; background: #FFF3E0; border-left: 5px solid #FF9800; border-radius: 4px; font-size: 13px; color: #E65100;">
+                            <strong>Risk Alert:</strong> There are currently <t t-esc="data.get('open_compliance')"/> open or overdue compliance issues within this review boundary. Governance scores will experience negative adjustments until remediation owners log resolutions.
+                        </div>
+                    </t>
+
+                    <!-- SIGNATURE BLOCK -->
+                    <div style="margin-top: 60px; display: flex; justify-content: space-between; font-size: 13px; border-top: 1px dashed #ccc; padding-top: 20px;">
+                        <div>
+                            <span>Approved by: ________________________</span><br/>
+                            <span style="color: #777; font-size: 11px; margin-left: 90px;">Sustainability Director</span>
+                        </div>
+                        <div>
+                            <span>Date: ________________________</span>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
