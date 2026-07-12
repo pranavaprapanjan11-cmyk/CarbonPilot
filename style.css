@@ -1558,3 +1558,8 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+.form-input option {
+  background-color: #07080d;
+  color: var(--text-main);
+}
+
