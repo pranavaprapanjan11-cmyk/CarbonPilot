@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ROOT ESG MENU -->
+    <menuitem id="menu_ecosphere_root" name="EcoSphere AI" web_icon="ecosphere_ai,static/description/icon.png" sequence="10"/>
+
+    <!-- CLIENT ACTION (DASHBOARD) -->
+    <menuitem id="menu_ecosphere_dashboard" name="ESG Digital Twin" parent="menu_ecosphere_root" action="action_ecosphere_dashboard_twin" sequence="1"/>
+
+    <!-- ENVIRONMENTAL SUBMENU -->
+    <menuitem id="menu_ecosphere_environmental" name="Environmental" parent="menu_ecosphere_root" sequence="10"/>
+
+    <!-- SOCIAL SUBMENU -->
+    <menuitem id="menu_ecosphere_social" name="Social Pillars" parent="menu_ecosphere_root" sequence="20"/>
+
+    <!-- GOVERNANCE SUBMENU -->
+    <menuitem id="menu_ecosphere_governance" name="Governance &amp; Risk" parent="menu_ecosphere_root" sequence="30"/>
+
+    <!-- GAMIFICATION SUBMENU -->
+    <menuitem id="menu_ecosphere_gamification" name="Gamification" parent="menu_ecosphere_root" sequence="40"/>
+</odoo>
