@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- SUSTAINABILITY CHALLENGES VIEWS -->
+    <record id="view_ecosphere_challenge_tree" model="ir.ui.view">
+        <name>ecosphere.challenge.tree</name>
+        <model>ecosphere.challenge</model>
+        <arch type="xml">
+            <tree string="Active Challenges" decoration-info="status == 'active'" decoration-success="status == 'completed'" decoration-muted="status == 'archived'">
+                <field name="name"/>
+                <field name="category"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="xp_reward" sum="Total Reward XP Available"/>
+                <field name="participant_count"/>
+                <field name="status" widget="badge" decoration-warning="status == 'draft'" decoration-info="status == 'active'" decoration-success="status == 'completed'"/>
+            </tree>
+        </arch>
+    </record>
+
+    <record id="view_ecosphere_challenge_form" model="ir.ui.view">
+        <name>ecosphere.challenge.form</name>
+        <model>ecosphere.challenge</model>
+        <arch type="xml">
+            <form string="Eco Challenge Card">
+                <header>
+                    <button name="action_activate" string="Activate Challenge" type="object" states="draft" class="oe_highlight"/>
+                    <button name="action_close" string="Evaluation Phase" type="object" states="active" class="oe_highlight"/>
+                    <button name="action_complete" string="Distribute Rewards" type="object" states="review" class="oe_highlight"/>
+                    <field name="status" widget="statusbar" statusbar_visible="draft,active,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Challenge Campaign Title..."/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="category"/>
+                            <field name="xp_reward"/>
+                        </group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="participants" string="Participating Staff">
+                            <field name="participation_ids">
+                                <tree editable="bottom">
+                                    <field name="employee_id"/>
+                                    <field name="status" widget="badge" decoration-info="status == 'joined'" decoration-success="status == 'completed'" decoration-danger="status == 'failed'"/>
+                                    <button name="action_mark_completed" string="Target Achieved" type="object" icon="fa-check" states="joined" class="text-success"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page name="objective" string="Challenge Objective Description">
+                            <field name="description" placeholder="Specify parameters e.g., print less than 10 sheets or complete 20 miles bicycle commute..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </arch>
+    </record>
+
+    <record id="action_ecosphere_challenges" model="ir.actions.act_window">
+        <name>Eco Challenges</name>
+        <res_model>ecosphere.challenge</res_model>
+        <view_mode>tree,form</view_mode>
+    </record>
+
+    <menuitem id="menu_ecosphere_challenge_actions" name="Sustainability Challenges" parent="menu_ecosphere_gamification" action="action_ecosphere_challenges" sequence="10"/>
+
+
+    <!-- REWARD MARKETPLACE VIEWS -->
+    <record id="view_ecosphere_reward_tree" model="ir.ui.view">
+        <name>ecosphere.reward.marketplace.tree</name>
+        <model>ecosphere.reward.marketplace</model>
+        <arch type="xml">
+            <tree string="Rewards Shop" editable="bottom">
+                <field name="name"/>
+                <field name="cost_xp"/>
+                <field name="stock"/>
+                <field name="status" widget="badge" decoration-success="status == 'available'" decoration-danger="status == 'out_of_stock'"/>
+            </tree>
+        </arch>
+    </record>
+
+    <record id="action_ecosphere_rewards" model="ir.actions.act_window">
+        <name>Rewards Marketplace</name>
+        <res_model>ecosphere.reward.marketplace</res_model>
+        <view_mode>tree</view_mode>
+    </record>
+
+    <menuitem id="menu_ecosphere_reward_actions" name="XP Reward Store" parent="menu_ecosphere_gamification" action="action_ecosphere_rewards" sequence="20"/>
+
+
+    <!-- REDEMPTION LEDGER VIEWS -->
+    <record id="view_ecosphere_redemption_tree" model="ir.ui.view">
+        <name>ecosphere.reward.redemption.tree</name>
+        <model>ecosphere.reward.redemption</model>
+        <arch type="xml">
+            <tree string="Redemption Logs" decoration-info="status == 'pending'" decoration-success="status == 'delivered'">
+                <field name="employee_id"/>
+                <field name="reward_id"/>
+                <field name="date_redeemed"/>
+                <field name="status" widget="badge" decoration-warning="status == 'pending'" decoration-success="status == 'delivered'"/>
+                <button name="action_deliver" string="Deliver Reward" type="object" icon="fa-truck" states="pending" class="oe_highlight"/>
+            </tree>
+        </arch>
+    </record>
+
+    <record id="action_ecosphere_redemptions" model="ir.actions.act_window">
+        <name>Redemption Ledger</name>
+        <res_model>ecosphere.reward.redemption</res_model>
+        <view_mode>tree</view_mode>
+    </record>
+
+    <menuitem id="menu_ecosphere_redemption_actions" name="Redemptions Ledger" parent="menu_ecosphere_gamification" action="action_ecosphere_redemptions" sequence="30"/>
+
+
+    <!-- BADGES VIEW -->
+    <record id="view_ecosphere_badge_tree" model="ir.ui.view">
+        <name>ecosphere.badge.tree</name>
+        <model>ecosphere.badge</model>
+        <arch type="xml">
+            <tree string="Sustainability Badges" editable="bottom">
+                <field name="name"/>
+                <field name="badge_type"/>
+                <field name="description"/>
+            </tree>
+        </arch>
+    </record>
+
+    <record id="action_ecosphere_badges" model="ir.actions.act_window">
+        <name>Sustainability Badges</name>
+        <res_model>ecosphere.badge</res_model>
+        <view_mode>tree</view_mode>
+    </record>
+
+    <menuitem id="menu_ecosphere_badge_actions" name="Badges Database" parent="menu_ecosphere_gamification" action="action_ecosphere_badges" sequence="40"/>
+</odoo>
