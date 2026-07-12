@@ -1138,8 +1138,12 @@ function initLogin() {
   const btnLogout = document.getElementById("btn-logout");
   const forgotLink = document.getElementById("btn-forgot-pwd");
 
+  console.log("Initializing Login System...");
+
   // Check active session status
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  console.log("Current session status - isLoggedIn:", isLoggedIn);
+  
   if (isLoggedIn) {
     if (loginContainer) loginContainer.classList.add("hidden-gate");
     if (appContainer) appContainer.classList.remove("hidden-gate");
@@ -1148,48 +1152,82 @@ function initLogin() {
     if (appContainer) appContainer.classList.add("hidden-gate");
   }
 
-  if (loginForm) {
-    loginForm.addEventListener("submit", (e) => {
+  // Unified auth logic
+  const performAuthentication = (e) => {
+    if (e) {
       e.preventDefault();
-      console.log("Login form submitted");
-      
-      const email = loginEmail.value.trim();
-      const password = loginPassword.value;
+      e.stopPropagation();
+    }
+    
+    console.log("performAuthentication() triggered");
 
-      if (email === "admin@ecosphere.ai" && password === "admin123") {
-        console.log("Login successful");
-        localStorage.setItem("isLoggedIn", "true");
-        
-        if (loginError) loginError.classList.add("hidden");
-        if (loginContainer) loginContainer.classList.add("hidden-gate");
-        if (appContainer) appContainer.classList.remove("hidden-gate");
-        
-        showToast("Authentication successful. Welcome to Carbon Pilot.", "success");
-        
-        // Re-render and trigger layouts sync because container was display:none
-        if (dashboardState.chartInstance) {
-          dashboardState.chartInstance.resize();
-          dashboardState.chartInstance.update();
-        }
-        
-        // Re-run initial simulation calculations
-        simulateOperations(false);
-        renderDashboard();
+    if (!loginEmail || !loginPassword) {
+      console.error("Critical: Email or password field elements missing from DOM.");
+      return;
+    }
+
+    const email = loginEmail.value.trim().toLowerCase();
+    const password = loginPassword.value;
+
+    console.log("Login credentials audit:");
+    console.log("  Input Email  :", email);
+    console.log("  Input Pwd Len:", password.length);
+    console.log("  Expected Email: admin@ecosphere.ai");
+    console.log("  Expected Pwd  : admin123");
+
+    if (email === "admin@ecosphere.ai" && password === "admin123") {
+      console.log("Authentication successful! Loading dashboard...");
+      localStorage.setItem("isLoggedIn", "true");
+      
+      if (loginError) loginError.classList.add("hidden");
+      if (loginContainer) loginContainer.classList.add("hidden-gate");
+      if (appContainer) appContainer.classList.remove("hidden-gate");
+      
+      showToast("Authentication successful. Welcome to Carbon Pilot.", "success");
+      
+      // Force Chart.js to recalculate dimensions since container display:none is lifted
+      if (dashboardState.chartInstance) {
+        console.log("Resizing Chart.js canvas...");
+        dashboardState.chartInstance.resize();
+        dashboardState.chartInstance.update();
+      }
+      
+      // Run calculations and redraw
+      simulateOperations(false);
+      renderDashboard();
+    } else {
+      console.log("Authentication failed: invalid credentials.");
+      if (loginError) loginError.classList.remove("hidden");
+      showToast("Authentication failed. Invalid credentials.", "error");
+    }
+  };
+
+  // Bind to form submission
+  if (loginForm) {
+    loginForm.addEventListener("submit", performAuthentication);
+  }
+
+  // Double-bind to button click to support direct programmatic triggers
+  const btnSubmit = document.getElementById("btn-submit-login");
+  if (btnSubmit) {
+    btnSubmit.addEventListener("click", (e) => {
+      console.log("Button Clicked: btn-submit-login");
+      if (loginForm && !loginForm.checkValidity()) {
+        console.log("Form inputs invalid, triggering native validation messages");
+        loginForm.reportValidity();
       } else {
-        console.log("Login failed");
-        if (loginError) loginError.classList.remove("hidden");
-        showToast("Authentication failed. Invalid credentials.", "error");
+        performAuthentication(e);
       }
     });
   }
 
   if (btnLogout) {
     btnLogout.addEventListener("click", () => {
-      console.log("Logout button clicked");
+      console.log("Button Clicked: Logout");
       localStorage.removeItem("isLoggedIn");
       showToast("Logged out successfully.", "info");
       
-      // Reload page to clear all state cleanly and show login gateway
+      // Reload page to clear memory state cleanly and show login card
       setTimeout(() => {
         window.location.reload();
       }, 800);
@@ -1199,7 +1237,7 @@ function initLogin() {
   if (forgotLink) {
     forgotLink.addEventListener("click", (e) => {
       e.preventDefault();
-      console.log("Forgot Password link clicked");
+      console.log("Button Clicked: Forgot Password");
       showToast("Diagnostic Credentials: admin@ecosphere.ai / admin123", "info");
     });
   }
