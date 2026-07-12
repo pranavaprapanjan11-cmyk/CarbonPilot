@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ESG Security Category -->
+    <record id="module_category_ecosphere" model="ir.module.category">
+        <name>EcoSphere ESG Management</name>
+        <description>Access level management for the EcoSphere ESG Platform.</description>
+        <sequence>20</sequence>
+    </record>
+
+    <!-- EcoSphere Employee (User) Group -->
+    <record id="group_ecosphere_user" model="res.groups">
+        <name>Employee</name>
+        <category_id ref="module_category_ecosphere"/>
+        <implied_ids eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- EcoSphere ESG Manager (Officer) Group -->
+    <record id="group_ecosphere_officer" model="res.groups">
+        <name>ESG Officer / Manager</name>
+        <category_id ref="module_category_ecosphere"/>
+        <implied_ids eval="[(4, ref('group_ecosphere_user'))]"/>
+        <users eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+    </record>
+</odoo>
