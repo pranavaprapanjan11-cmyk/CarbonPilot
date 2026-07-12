@@ -21,7 +21,7 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Main Grid Layout -->
-  <div class="app-container">
+  <div class="app-container hidden-gate" id="app-dashboard-container">
     
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
@@ -95,6 +95,9 @@
           </div>
           <button class="btn btn-secondary btn-icon" id="btn-reset" title="Reset Dashboard">
             <i class="fa-solid fa-rotate-left"></i> Reset
+          </button>
+          <button class="btn btn-secondary btn-icon" id="btn-logout" title="Logout">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
           </button>
         </div>
       </header>
@@ -574,6 +577,49 @@
       <div class="modal-footer">
         <button class="btn btn-primary" id="btn-confirm-audit">Acknowledge & Save Audit Report (+250 XP)</button>
       </div>
+    </div>
+  </div>
+
+  <!-- LOGIN GATEWAY -->
+  <div id="login-container" class="login-overlay hidden-gate">
+    <div class="login-card glass-card border-glow-green animate-fade-in">
+      <div class="login-brand">
+        <div class="logo-icon">
+          <i class="fa-solid fa-leaf text-glow-green"></i>
+        </div>
+        <div class="brand-name">
+          <span class="brand-eco">EcoSphere</span>
+          <span class="brand-ai">AI</span>
+        </div>
+      </div>
+      <div class="login-tagline">CARBON PILOT LOGIN</div>
+      
+      <form id="login-form" class="login-form">
+        <div class="form-group">
+          <label for="login-email"><i class="fa-solid fa-envelope"></i> Email Address</label>
+          <input type="email" id="login-email" required placeholder="admin@ecosphere.ai" class="form-input">
+        </div>
+        
+        <div class="form-group">
+          <label for="login-password"><i class="fa-solid fa-lock"></i> Password</label>
+          <input type="password" id="login-password" required placeholder="••••••••" class="form-input">
+        </div>
+        
+        <div class="form-options">
+          <label class="checkbox-container">
+            <input type="checkbox" id="login-remember"> Remember Me
+          </label>
+          <a href="#" class="forgot-link" id="btn-forgot-pwd">Forgot Password?</a>
+        </div>
+        
+        <div id="login-error" class="login-error-msg hidden">
+          <i class="fa-solid fa-circle-exclamation"></i> Invalid credentials.
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-full" id="btn-submit-login">
+          <i class="fa-solid fa-right-to-bracket"></i> Access Control Center
+        </button>
+      </form>
     </div>
   </div>
 
