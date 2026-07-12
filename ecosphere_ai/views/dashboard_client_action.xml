@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- CLIENT ACTION CLIENT TAG DEFINITION -->
+    <!-- The JavaScript OWL Component binds to the tag 'ecosphere_dashboard_client_action' -->
+    <record id="action_ecosphere_dashboard_twin" model="ir.actions.client">
+        <name>ESG Digital Twin Dashboard</name>
+        <tag>ecosphere_dashboard_client_action</tag>
+        <target>current</target>
+    </record>
+</odoo>
