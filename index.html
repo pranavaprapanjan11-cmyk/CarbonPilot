@@ -70,7 +70,7 @@
         </div>
         <div class="user-info">
           <div class="user-name" id="profile-user-name">Sustainability Pilot</div>
-          <div class="user-level-tag">Level <span id="profile-level">3</span> Champion</div>
+          <div class="user-level-tag"><span id="profile-user-role" class="text-glow-purple font-bold">Admin</span> | Lvl <span id="profile-level">3</span></div>
           <div class="xp-bar-container-mini">
             <div class="xp-bar-fill-mini" id="profile-xp-bar-fill" style="width: 50%;"></div>
           </div>
@@ -86,7 +86,7 @@
       <header class="top-header">
         <div class="header-search">
           <h1>Sustainability Control Center</h1>
-          <p class="header-subtitle"><i class="fa-solid fa-user-circle text-cyan"></i> Pilot: <span id="header-user-name" class="font-bold text-glow-cyan">Admin</span> (<span id="header-user-dept">HQ</span>) | ESG Control Center</p>
+          <p class="header-subtitle"><i class="fa-solid fa-user-circle text-cyan"></i> Pilot: <span id="header-user-name" class="font-bold text-glow-cyan">Admin</span> (<span id="header-user-dept">HQ</span> - <span id="header-user-role">Admin</span>) | ESG Control Center</p>
         </div>
         <div class="header-actions">
           <div class="system-status">
@@ -661,6 +661,16 @@
             <option value="R&D & Facilities">R&D & Facilities</option>
             <option value="Sales & Commute">Sales & Commute</option>
             <option value="HR & Administration">HR & Administration</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="register-role"><i class="fa-solid fa-user-tag"></i> Role Selection</label>
+          <select id="register-role" required class="form-input" style="background-color: #0b0f19;">
+            <option value="Employee">Employee</option>
+            <option value="Manager">Manager</option>
+            <option value="Sustainability Officer">Sustainability Officer</option>
+            <option value="Admin">Admin</option>
           </select>
         </div>
         
