@@ -1138,7 +1138,48 @@ function initLogin() {
   const btnLogout = document.getElementById("btn-logout");
   const forgotLink = document.getElementById("btn-forgot-pwd");
 
-  console.log("Initializing Login System...");
+  // Toggle Forms Elements
+  const loginCard = document.getElementById("login-card");
+  const registerCard = document.getElementById("register-card");
+  const btnShowRegister = document.getElementById("btn-show-register");
+  const btnShowLogin = document.getElementById("btn-show-login");
+
+  // Registration Form Elements
+  const registerForm = document.getElementById("register-form");
+  const registerName = document.getElementById("register-name");
+  const registerEmail = document.getElementById("register-email");
+  const registerDept = document.getElementById("register-dept");
+  const registerPassword = document.getElementById("register-password");
+  const registerConfirmPassword = document.getElementById("register-confirm-password");
+  const registerError = document.getElementById("register-error");
+
+  console.log("Initializing Login & Registration Systems...");
+
+  // Synchronize dynamic headers and profiles based on session state
+  const syncCurrentUserProfile = () => {
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+    if (isLoggedIn) {
+      let user = { name: "Administrator", department: "HQ Command" };
+      const savedUser = localStorage.getItem("currentUser");
+      if (savedUser) {
+        try {
+          user = JSON.parse(savedUser);
+        } catch (e) {
+          console.error("Error reading saved user session:", e);
+        }
+      }
+      
+      console.log("Syncing profile UI for pilot:", user.name);
+
+      const elHeaderName = document.getElementById("header-user-name");
+      const elHeaderDept = document.getElementById("header-user-dept");
+      const elProfileName = document.getElementById("profile-user-name");
+
+      if (elHeaderName) elHeaderName.textContent = user.name;
+      if (elHeaderDept) elHeaderDept.textContent = user.department;
+      if (elProfileName) elProfileName.textContent = user.name;
+    }
+  };
 
   // Check active session status
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
@@ -1147,10 +1188,42 @@ function initLogin() {
   if (isLoggedIn) {
     if (loginContainer) loginContainer.classList.add("hidden-gate");
     if (appContainer) appContainer.classList.remove("hidden-gate");
+    syncCurrentUserProfile();
   } else {
     if (loginContainer) loginContainer.classList.remove("hidden-gate");
     if (appContainer) appContainer.classList.add("hidden-gate");
   }
+
+  // Toggle buttons
+  if (btnShowRegister && loginCard && registerCard) {
+    btnShowRegister.addEventListener("click", (e) => {
+      e.preventDefault();
+      console.log("Showing Registration Panel");
+      loginCard.classList.add("hidden");
+      registerCard.classList.remove("hidden");
+    });
+  }
+
+  if (btnShowLogin && loginCard && registerCard) {
+    btnShowLogin.addEventListener("click", (e) => {
+      e.preventDefault();
+      console.log("Showing Login Panel");
+      registerCard.classList.add("hidden");
+      loginCard.classList.remove("hidden");
+    });
+  }
+
+  // Helper to fetch user database
+  const getRegisteredUsers = () => {
+    const data = localStorage.getItem("ecosphere_users");
+    if (!data) return [];
+    try {
+      return JSON.parse(data);
+    } catch (e) {
+      console.error("Error parsing registered users:", e);
+      return [];
+    }
+  };
 
   // Unified auth logic
   const performAuthentication = (e) => {
@@ -1169,21 +1242,33 @@ function initLogin() {
     const email = loginEmail.value.trim().toLowerCase();
     const password = loginPassword.value;
 
-    console.log("Login credentials audit:");
-    console.log("  Input Email  :", email);
-    console.log("  Input Pwd Len:", password.length);
-    console.log("  Expected Email: admin@ecosphere.ai");
-    console.log("  Expected Pwd  : admin123");
+    console.log("Attempting Login for:", email);
 
+    let authUser = null;
+
+    // Check admin
     if (email === "admin@ecosphere.ai" && password === "admin123") {
-      console.log("Authentication successful! Loading dashboard...");
+      authUser = { name: "Administrator", email: "admin@ecosphere.ai", department: "HQ Command" };
+    } else {
+      // Check registered users
+      const users = getRegisteredUsers();
+      const match = users.find(u => u.email === email && u.password === password);
+      if (match) {
+        authUser = match;
+      }
+    }
+
+    if (authUser) {
+      console.log("Authentication successful! Loading dashboard for:", authUser.name);
       localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("currentUser", JSON.stringify(authUser));
       
       if (loginError) loginError.classList.add("hidden");
       if (loginContainer) loginContainer.classList.add("hidden-gate");
       if (appContainer) appContainer.classList.remove("hidden-gate");
       
-      showToast("Authentication successful. Welcome to Carbon Pilot.", "success");
+      syncCurrentUserProfile();
+      showToast(`Welcome back, ${authUser.name}!`, "success");
       
       // Force Chart.js to recalculate dimensions since container display:none is lifted
       if (dashboardState.chartInstance) {
@@ -1202,18 +1287,111 @@ function initLogin() {
     }
   };
 
-  // Bind to form submission
+  // Unified registration logic
+  const performRegistration = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    console.log("performRegistration() triggered");
+
+    if (!registerName || !registerEmail || !registerDept || !registerPassword || !registerConfirmPassword) {
+      console.error("Critical: One or more registration inputs are missing from DOM.");
+      return;
+    }
+
+    const name = registerName.value.trim();
+    const email = registerEmail.value.trim().toLowerCase();
+    const dept = registerDept.value;
+    const pwd = registerPassword.value;
+    const pwdConfirm = registerConfirmPassword.value;
+
+    // Required check
+    if (!name || !email || !dept || !pwd || !pwdConfirm) {
+      showRegisterError("All fields are required.");
+      return;
+    }
+
+    // Password length check
+    if (pwd.length < 8) {
+      showRegisterError("Password must be at least 8 characters long.");
+      return;
+    }
+
+    // Passwords match check
+    if (pwd !== pwdConfirm) {
+      showRegisterError("Passwords do not match.");
+      return;
+    }
+
+    // Email unique check
+    if (email === "admin@ecosphere.ai") {
+      showRegisterError("This email address is reserved.");
+      return;
+    }
+
+    const users = getRegisteredUsers();
+    if (users.some(u => u.email === email)) {
+      showRegisterError("This email address is already registered.");
+      return;
+    }
+
+    // Create account
+    console.log("Creating new user account for:", name);
+    const newUser = {
+      id: "usr_" + Date.now(),
+      name: name,
+      email: email,
+      department: dept,
+      password: pwd, // Storing password for diagnostic login matching
+      registeredAt: new Date().toISOString()
+    };
+
+    users.push(newUser);
+    localStorage.setItem("ecosphere_users", JSON.stringify(users));
+
+    // Log user in automatically
+    localStorage.setItem("isLoggedIn", "true");
+    localStorage.setItem("currentUser", JSON.stringify(newUser));
+
+    if (registerError) registerError.classList.add("hidden");
+    if (loginContainer) loginContainer.classList.add("hidden-gate");
+    if (appContainer) appContainer.classList.remove("hidden-gate");
+
+    syncCurrentUserProfile();
+    showToast(`Account created! Welcome, ${newUser.name}.`, "success");
+
+    // Force Chart.js resize
+    if (dashboardState.chartInstance) {
+      dashboardState.chartInstance.resize();
+      dashboardState.chartInstance.update();
+    }
+
+    simulateOperations(false);
+    renderDashboard();
+  };
+
+  const showRegisterError = (msg) => {
+    console.log("Registration error:", msg);
+    if (registerError) {
+      registerError.textContent = msg;
+      registerError.classList.remove("hidden");
+    }
+    showToast(msg, "error");
+  };
+
+  // Bind to Login Form submission
   if (loginForm) {
     loginForm.addEventListener("submit", performAuthentication);
   }
 
-  // Double-bind to button click to support direct programmatic triggers
+  // Double-bind Login button
   const btnSubmit = document.getElementById("btn-submit-login");
   if (btnSubmit) {
     btnSubmit.addEventListener("click", (e) => {
       console.log("Button Clicked: btn-submit-login");
       if (loginForm && !loginForm.checkValidity()) {
-        console.log("Form inputs invalid, triggering native validation messages");
         loginForm.reportValidity();
       } else {
         performAuthentication(e);
@@ -1221,13 +1399,32 @@ function initLogin() {
     });
   }
 
+  // Bind to Register Form submission
+  if (registerForm) {
+    registerForm.addEventListener("submit", performRegistration);
+  }
+
+  // Double-bind Register button
+  const btnSubmitRegister = document.getElementById("btn-submit-register");
+  if (btnSubmitRegister) {
+    btnSubmitRegister.addEventListener("click", (e) => {
+      console.log("Button Clicked: btn-submit-register");
+      if (registerForm && !registerForm.checkValidity()) {
+        registerForm.reportValidity();
+      } else {
+        performRegistration(e);
+      }
+    });
+  }
+
+  // Logout trigger
   if (btnLogout) {
     btnLogout.addEventListener("click", () => {
       console.log("Button Clicked: Logout");
       localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("currentUser");
       showToast("Logged out successfully.", "info");
       
-      // Reload page to clear memory state cleanly and show login card
       setTimeout(() => {
         window.location.reload();
       }, 800);
